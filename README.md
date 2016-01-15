@@ -681,7 +681,7 @@ This function will be called at the bottom of our app, after all the other funct
 
 **UI/HTML**
 
-The UI is quite minimalistic. A couple of divs, one for the editor and one for the editor. The current example lacks CSS definitions for some classes (e.g. `hidden`), which you can get from the Github repo (link below).
+The UI is quite minimalistic. A couple of divs, one for the viewer and one for the editor. The current example lacks CSS definitions for some classes (e.g. `hidden`), which you can get from the Github repo (link below).
 
 ```html
 <div class="content center-text" id="view" class="hidden">
