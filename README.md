@@ -540,10 +540,10 @@ function publish () {
 
 Now that we have a way to create new bis, let's create a corresponding function that reads and displays bins.
 
-We can use Solid.js to fetch the contents of a bin. Let's call this fetching function `loadBin`. Our function will take two parameters - one is the URL of the bin, and the other one is a flag that indicates whether we need to display the editor or not.
+We can use Solid.js to fetch the contents of a bin. Let's call this fetching function `load`. Our function will take two parameters - one is the URL of the bin, and the other one is a flag that indicates whether we need to display the editor or not.
 
 ```Javascript
-function loadBin (url, showEditor) {
+function load (url, showEditor) {
     Solid.web.get(url).then(function(g) {
     
     }).catch(function(err) {
