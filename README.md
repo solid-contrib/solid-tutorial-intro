@@ -231,7 +231,7 @@ together. For example:
 
         as:published "2015-12-29T19:49+00:00"^^xsd:dateTime ;
 
-        as:tag "star trek", "life" .
+        as:tag <http://rhiaro.co.uk/tag/star+trek>, <http://rhiaro.co.uk/tag/life> .
 ```
 
 **An activity** (the act of creating the above note, e.g. imagine it as it would appear in a notifications stream):
