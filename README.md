@@ -448,7 +448,9 @@ You will learn how to:
 
 Before we start writing the functions that create and view bins, we need to decide how the app will work. For instance, we know that we will use the app to create new bins, to view existing ones and also to update them.
 
-The easiest way to separate these different app functionalities, is to separate the states by using query parameters -- i.e. `?view=...`, `?edit=...`. 
+The easiest way to separate these different app functionalities, is to separate the states by using query parameters -- i.e. `?view=...`, `?edit=...`.
+
+Another important step we need to do right now is to add the required dependencies. These are [rdflib.js](https://github.com/linkeddata/rdflib.js) and [Solid.js](https://github.com/solid/solid.js).
 
 **Picking the vocabularies**
 
