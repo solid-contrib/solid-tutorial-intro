@@ -165,7 +165,7 @@ as *serialisations*:
 - RDFa (RDF embedded into HTML attributes)
 - JSON-LD
 
-See **[Linked Data 101](http://rhiaro.github.io/sws/)** for a quick introduction
+See **[Linked Data 101](http://rhiaro.github.io/sws/)** or the [RDF primer](https://www.w3.org/2000/10/swap/Primer.html) for a quick introduction
 to RDF structure and concepts.
 
 ### Schemas and Vocabularies
