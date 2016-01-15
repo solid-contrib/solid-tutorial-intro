@@ -556,7 +556,7 @@ function load (url, showEditor) {
 The function `Solid.web.get()` returns a graph object `g` in case of success. This object has a few methods that allow us to query the graph for specific triples - i.e. `g.any()`. We'll use this method to get the title and body of a bin.
 
 ```Javascript
-function loadBin (url, showEditor) {
+function load (url, showEditor) {
     Solid.web.get(url).then(function(g) {
         // set url
         bin.url = url;
@@ -579,10 +579,10 @@ function loadBin (url, showEditor) {
 
 Now that we have set our `bin` object with the right values, we can update the view, depending on whether or not we have to display the editor.
 
-Here is the final version of our `loadBin` function.
+Here is the final version of our `load` function.
 
 ```Javascript
-function loadBin (url, showEditor) {
+function load (url, showEditor) {
     Solid.web.get(url).then(function(g) {
         // set url
         bin.url = url;
@@ -669,9 +669,9 @@ Next we can go ahead and create an `init()` function where we handle our "routin
 ```Javascript
 function init() {
     if (queryVals['view'] && queryVals['view'].length > 0) {
-        loadBin(queryVals['view']);
+        load(queryVals['view']);
     } else if (queryVals['edit'] && queryVals['edit'].length > 0) {
-        loadBin(queryVals['edit'], true);
+        load(queryVals['edit'], true);
     } else {
         document.getElementById('submit').setAttribute('onclick', 'publish()');
         document.getElementById('edit').classList.remove('hidden');
