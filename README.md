@@ -436,7 +436,7 @@ how to use the library to make web apps:
 
 https://github.com/solid/solid.js.
 
-### Pastbin Example
+### Pastebin Example
 
 This example will walk you through the steps required to build a typical Solid app. 
 You will learn how to:
