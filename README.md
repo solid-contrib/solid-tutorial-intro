@@ -436,11 +436,269 @@ how to use the library to make web apps:
 
 https://github.com/solid/solid.js.
 
-### Note Editor Example
+### Pastbin Example
 
-TODO: write a tutorial to walk the users through a simple plain-text notes editor / pastebin app
+This example will walk you through the steps required to build a typical Solid app. 
+You will learn how to:
+- create new resources (paste bins)
+- view created bins
+- update existing bins
 
-- create a 'notes' container
-- read/create/edit plain-text file notes to that container
+**Preparing the app**
 
-See ["user posts a note" example](https://github.com/solid/solid-spec#example)
+Before we start writing the functions that create and view bins, we need to decide how the app will work. For instance, we know that we will use the app to create new bins, to view existing ones and also to update them.
+
+The easiest way to separate these different app functionalities, is to separate the states by using query parameters -- i.e. `?view=...`, `?edit=...`. 
+
+**Picking the vocabularies**
+
+For this particular app, we can go with two very common vocabularies, `SIOC` and `Dublin Core Terms`. Using them is just a matter of defining the rdflib.js namespaces.
+
+```Javascript
+// common RDF vocabs
+var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
+var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#");
+```
+
+**Local data structure**
+
+Next, we can define how we want to structure our bins. For example, a bin could have a title and body (content), but also a URI (useful later for updates).
+
+```Javascript
+// Bin structure
+var bin = {
+    url: '',
+    title: '',
+    body: ''
+};
+```
+
+**Default container for new bins**
+
+To create bins we have to define a default container to which we POST the bin. For now we can create a global variable called `defaultContainer`. The value of this variable can be a `bins`container on your account, which you have created with Warp.
+
+```Javascript
+var defaultContainer = 'https://user.databox.me/Public/bins/';
+```
+
+Now let's prepare a few functions that make the bread and butter of our app.
+
+**Creating new bins**
+
+Creating new bins is easy. It involves using Solid.js to post the bin data to the defaultContainer. We can create a `publish()` function which will handle this step. This function will read the value of the title and body elements from the editor.
+
+```Javascript
+function publish () {
+    bin.title = document.getElementById('edit-title').value;
+    bin.body = document.getElementById('edit-body').value;
+}
+```
+
+Next, we will create a new graph object, in which we'll add the two triples, one for the title and one for the body. We will also store the serialized value of the graph in a new `data` variable.
+
+```Javascript
+function publish () {
+    bin.title = document.getElementById('edit-title').value;
+    bin.body = document.getElementById('edit-body').value;
+    
+    var g = new $rdf.graph();
+    g.add($rdf.sym(''), DCT('title'), bin.title);
+    g.add($rdf.sym(''), SIOC('content'), bin.body);
+    var data = new $rdf.Serializer(g).toN3(g);
+}
+```
+
+Finally, we will use Solid.js to POST the new bin to the server. If the POST succeeded, we will update the URL bar to the viewer. Else, we will have to deal with the error.
+
+Here is the final function.
+
+
+```Javascript
+function publish () {
+    bin.title = document.getElementById('edit-title').value;
+    bin.body = document.getElementById('edit-body').value;
+
+    var g = new $rdf.graph();
+    g.add($rdf.sym(''), DCT('title'), bin.title);
+    g.add($rdf.sym(''), SIOC('content'), bin.body);
+    var data = new $rdf.Serializer(g).toN3(g);
+
+    Solid.web.post(defaultContainer, undefined, data).then(function(meta) {
+        // view
+        window.location.search = "?view="+encodeURIComponent(meta.url);
+    }).catch(function(err) {
+        // do something with the error
+        console.log(err);
+    });
+}
+```
+
+**Reading/viewing bins** 
+
+Now that we have a way to create new bis, let's create a corresponding function that reads and displays bins.
+
+We can use Solid.js to fetch the contents of a bin. Let's call this fetching function `loadBin`. Our function will take two parameters - one is the URL of the bin, and the other one is a flag that indicates whether we need to display the editor or not.
+
+```Javascript
+function loadBin (url, showEditor) {
+    Solid.web.get(url).then(function(g) {
+    
+    }).catch(function(err) {
+        // do something with the error
+        console.log(err);
+    });
+}
+```
+
+The function `Solid.web.get()` returns a graph object `g` in case of success. This object has a few methods that allow us to query the graph for specific triples - i.e. `g.any()`. We'll use this method to get the title and body of a bin.
+
+```Javascript
+function loadBin (url, showEditor) {
+    Solid.web.get(url).then(function(g) {
+        // set url
+        bin.url = url;
+        // add title
+        var title = g.any($rdf.sym(url), DCT('title'));
+        if (title) {
+            bin.title = title.value;
+        }
+        // add body
+        var body = g.any($rdf.sym(url), SIOC('content'));
+        if (body) {
+            bin.body = body.value;
+        }
+    }).catch(function(err) {
+        // do something with the error
+        console.log(err);
+    });
+}
+```    
+
+Now that we have set our `bin` object with the right values, we can update the view, depending on whether or not we have to display the editor.
+
+Here is the final version of our `loadBin` function.
+
+```Javascript
+function loadBin (url, showEditor) {
+    Solid.web.get(url).then(function(g) {
+        // set url
+        bin.url = url;
+        // add title
+        var title = g.any($rdf.sym(url), DCT('title'));
+        if (title) {
+            bin.title = title.value;
+        }
+        // add body
+        var body = g.any($rdf.sym(url), SIOC('content'));
+        if (body) {
+            bin.body = body.value;
+        }
+
+        if (edit) {
+            document.getElementById('edit-title').value = bin.title;
+            document.getElementById('edit-body').innerHTML = bin.body;
+            document.getElementById('submit').setAttribute('onclick', 'update()');
+            document.getElementById('edit').classList.remove('hidden');
+        } else {
+            document.getElementById('view-title').innerHTML = bin.title;
+            document.getElementById('view-body').innerHTML = bin.body;
+            document.getElementById('view').classList.remove('hidden');
+            document.getElementById('edit').classList.add('hidden');
+        }
+    }).catch(function(err) {
+        // do something with the error
+        console.log(err);
+    });
+}
+```
+
+**Updating bins**
+
+Updating bins is very similar to creating new ones. The only difference is that we use the URI of an existing bin, which we then pass to Solid.js' `Solid.web.put` function.
+
+```Javascript
+function update () {
+    bin.title = document.getElementById('edit-title').value;
+    bin.body = document.getElementById('edit-body').value;
+
+    var g = new $rdf.graph();
+    g.add($rdf.sym(''), DCT('title'), bin.title);
+    g.add($rdf.sym(''), SIOC('content'), bin.body);
+    var data = new $rdf.Serializer(g).toN3(g);
+
+    Solid.web.put(bin.url, data).then(function(meta) {
+        // view
+        window.location.search = "?view="+encodeURIComponent(meta.url);
+    }).catch(function(err) {
+        // do something with the error
+        console.log(err);
+    });
+}
+```
+
+**Routing different app states**
+
+Great, so now we have all the important functions in place. Let's put everything together! We know we can use the app to create and also to view bins. The final step now is to add the app logic which handles these different states. For that we need a utility function that parses the current URL and returns different query parameters.
+
+You can go ahead and just paste the following function in your app.
+
+```Javascript
+// Utility function to parse URL query string values
+var queryVals = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+})(window.location.search.substr(1).split('&'));
+```
+
+You can call this function every time you need to check that a query parameter is present and to get its value.
+
+Next we can go ahead and create an `init()` function where we handle our "routing". This function is in charge of parsing the current URL and either display the editor or load the viewer. It also sets the `onclick()` event on the submit button, depending on whether the editor is used to create a new bin or to update an old one.
+
+```Javascript
+function init() {
+    if (queryVals['view'] && queryVals['view'].length > 0) {
+        loadBin(queryVals['view']);
+    } else if (queryVals['edit'] && queryVals['edit'].length > 0) {
+        loadBin(queryVals['edit'], true);
+    } else {
+        document.getElementById('submit').setAttribute('onclick', 'publish()');
+        document.getElementById('edit').classList.remove('hidden');
+    }
+}
+```
+
+This function will be called at the bottom of our app, after all the other functions have been defined.
+
+**UI/HTML**
+
+The UI is quite minimalistic. A couple of divs, one for the editor and one for the editor. The current example lacks CSS definitions for some classes (e.g. `hidden`), which you can get from the Github repo (link below).
+
+```html
+<div class="content center-text" id="view" class="hidden">
+    <h1 id="view-title"></h1>
+    <br>
+    <div id="view-body"></div>
+</div>
+
+<div class="content center-text" id="edit" class="hidden">
+    <input type="text" id="edit-title" class="block" placeholder="Title...">
+    <br>
+    <textarea id="edit-body" class="block" placeholder="Paste text here..."></textarea>
+    <br>
+    <button id="submit" class="btn">Publish</button>
+</div>
+```
+
+This is it, you're all set! You can use the following link for the source files of the full example app - [https://github.com/solid/solid-tutorial-pastebin/](https://github.com/solid/solid-tutorial-pastebin/)
+
+See also ["user posts a note" example](https://github.com/solid/solid-spec#example).
