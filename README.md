@@ -542,8 +542,8 @@ function publish () {
     bin.body = document.getElementById('edit-body').value;
 
     var g = new $rdf.graph();
-    g.add($rdf.sym(''), DCT('title'), bin.title);
-    g.add($rdf.sym(''), SIOC('content'), bin.body);
+    g.add($rdf.sym(''), DCT('title'), $rdf.lit(bin.title));
+    g.add($rdf.sym(''), SIOC('content'), $rdf.lit(bin.body));
     var data = new $rdf.Serializer(g).toN3(g);
 
     Solid.web.post(defaultContainer, undefined, data).then(function(meta) {
@@ -617,7 +617,7 @@ function load (url, showEditor) {
             bin.body = body.value;
         }
 
-        if (edit) {
+        if (showEditor) {
             document.getElementById('edit-title').value = bin.title;
             document.getElementById('edit-body').innerHTML = bin.body;
             document.getElementById('submit').setAttribute('onclick', 'update()');
