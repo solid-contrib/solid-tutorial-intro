@@ -546,7 +546,7 @@ function publish () {
     g.add($rdf.sym(''), SIOC('content'), $rdf.lit(bin.body));
     var data = new $rdf.Serializer(g).toN3(g);
 
-    Solid.web.post(defaultContainer, undefined, data).then(function(meta) {
+    Solid.web.post(defaultContainer, data).then(function(meta) {
         // view
         window.location.search = "?view="+encodeURIComponent(meta.url);
     }).catch(function(err) {
