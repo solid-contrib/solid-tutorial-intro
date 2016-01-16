@@ -452,17 +452,6 @@ The easiest way to separate these different app functionalities, is to separate 
 
 Another important step we need to do right now is to add the required dependencies. These are [rdflib.js](https://github.com/linkeddata/rdflib.js) and [Solid.js](https://github.com/solid/solid.js).
 
-**Picking the vocabularies**
-
-For this particular app, we can go with two very common vocabularies, `SIOC` and `Dublin Core Terms`. Using them is just a matter of defining the rdflib.js namespaces.
-
-```Javascript
-// common RDF vocabs
-var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
-var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#");
-```
-
 **Local data structure**
 
 Next, we can define how we want to structure our bins. For example, a bin could have a title and body (content), but also a URI (useful later for updates).
@@ -476,12 +465,43 @@ var bin = {
 };
 ```
 
-**Default container for new bins**
+**Picking the vocabularies**
+
+For this particular app, we can go with two very common vocabularies, `SIOC` and `Dublin Core Terms`. Using them is just a matter of defining the rdflib.js namespaces.
+
+```Javascript
+// common RDF vocabs
+var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+var DCT = $rdf.Namespace("http://purl.org/dc/terms/");
+var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#");
+```
+
+**Deciding where to store new bins**
 
 To create bins we have to define a default container to which we POST the bin. For now we can create a global variable called `defaultContainer`. The value of this variable can be a `bins`container on your account, which you have created with Warp.
 
 ```Javascript
 var defaultContainer = 'https://user.databox.me/Public/bins/';
+```
+
+**UI/HTML**
+
+The UI is quite minimalistic. A couple of divs, one for the viewer and one for the editor. The current example lacks CSS definitions for some classes (e.g. `hidden`), which you can get from the Github repo (link below).
+
+```html
+<div class="content center-text" id="view" class="hidden">
+    <h1 id="view-title"></h1>
+    <br>
+    <div id="view-body"></div>
+</div>
+
+<div class="content center-text" id="edit" class="hidden">
+    <input type="text" id="edit-title" class="block" placeholder="Title...">
+    <br>
+    <textarea id="edit-body" class="block" placeholder="Paste text here..."></textarea>
+    <br>
+    <button id="submit" class="btn">Publish</button>
+</div>
 ```
 
 Now let's prepare a few functions that make the bread and butter of our app.
@@ -680,26 +700,6 @@ function init() {
 ```
 
 This function will be called at the bottom of our app, after all the other functions have been defined.
-
-**UI/HTML**
-
-The UI is quite minimalistic. A couple of divs, one for the viewer and one for the editor. The current example lacks CSS definitions for some classes (e.g. `hidden`), which you can get from the Github repo (link below).
-
-```html
-<div class="content center-text" id="view" class="hidden">
-    <h1 id="view-title"></h1>
-    <br>
-    <div id="view-body"></div>
-</div>
-
-<div class="content center-text" id="edit" class="hidden">
-    <input type="text" id="edit-title" class="block" placeholder="Title...">
-    <br>
-    <textarea id="edit-body" class="block" placeholder="Paste text here..."></textarea>
-    <br>
-    <button id="submit" class="btn">Publish</button>
-</div>
-```
 
 This is it, you're all set! You can use the following link for the source files of the full example app - [https://github.com/solid/solid-tutorial-pastebin/](https://github.com/solid/solid-tutorial-pastebin/)
 
