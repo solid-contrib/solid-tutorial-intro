@@ -558,7 +558,7 @@ function publish () {
 
 **Reading/viewing bins** 
 
-Now that we have a way to create new bis, let's create a corresponding function that reads and displays bins.
+Now that we have a way to create new bins, let's create a corresponding function that reads and displays bins.
 
 We can use Solid.js to fetch the contents of a bin. Let's call this fetching function `load`. Our function will take two parameters - one is the URL of the bin, and the other one is a flag that indicates whether we need to display the editor or not.
 
