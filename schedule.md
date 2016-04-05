@@ -2,13 +2,13 @@
 
 ## WWW 2016 Tutorial, Tuesday 12 April
 
-**09:00** Introduction; motivation and principles for decentralisation
+**09:00** [Introduction; motivation and principles for decentralisation](https://github.com/rhiaro/solid-tutorial-intro#introduction)
 
-**09:30** Protocol and APIs
+**09:30** [Protocol and APIs](https://github.com/rhiaro/solid-tutorial-intro#protocols-and-apis)
 
 **10:30** Coffee break
 
-**11:00** Getting started with solid.js, Pastebin walkthrough
+**11:00** Getting started with solid.js, [Pastebin walkthrough](https://github.com/rhiaro/solid-tutorial-intro#pastebin-example)
 
 **12:30** Lunch
 
