@@ -66,8 +66,8 @@ relationship between two resources. Applications can use HTTP to create, read, u
 and delete resources in a datastore. Resources can be organised hierarchically in
 *containers*, which can be thought of like folders/directories.
 
-Simply, to read the attributes of any resource, an application does a GET request on
-the URL of the resource. For all of the resources in a container, a GET request on
+Simply, to get the data about (the attributes and their values of) any resource, an application
+does a GET request on the URL of the resource. For all of the resources in a container, a GET request on
 the container returns a list. For an application to create a new resource in a container,
 make an HTTP POST request to the container itself with the attributes of that resource,
 and an optional slug. To update a resource (or a container) use PUT or PATCH and to delete
