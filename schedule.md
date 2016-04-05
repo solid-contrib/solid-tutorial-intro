@@ -8,7 +8,9 @@
 
 **10:30** Coffee break
 
-**11:00** Getting started with solid.js, [Pastebin walkthrough](https://github.com/rhiaro/solid-tutorial-intro#pastebin-example)
+**11:00** Getting your own personal data store.
+
+**11:30** Getting started with solid.js, [Pastebin walkthrough](https://github.com/rhiaro/solid-tutorial-intro#pastebin-example)
 
 **12:30** Lunch
 
