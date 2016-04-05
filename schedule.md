@@ -33,7 +33,7 @@ Repositories for various projects are in the Solid github organisation, github.c
 ## Other useful links
 
 * The set of complementary
-  [standards](https://github.com/solid/solid-spec#standards-used) and
+  [standards](https://github.com/solid/solid#standards-used) and
   [data formats/vocabularies](https://github.com/solid/vocab) used in Solid.
 * The **[spec](https://github.com/solid/solid-spec)**
   that describes a REST API that extends those existing

@@ -108,7 +108,7 @@ properties.
 * **Classes** are used to say that `<some-thing>` is of type `<other-thing>`.
 For example: `<http://rhiaro.co.uk/about#me> type <Person>`. (Person is the class).
 
-* **Properties** are just the describing words. In the previous example `type` is
+* **Properties** are the attributes. In the previous example `type` is
 the property.
 
 * **Anyone can publish** a vocabulary, and you can use vocabularies that anyone
@@ -121,7 +121,7 @@ and their friends), Dublin Core (for describing publications, mostly),
 
 A good place to start looking for domain-specific terms to reuse is [LOV](http://lov.okfn.org).
 
-Vocabularies specifically for social you might be interested in include:
+Vocabularies specifically for social applications you might be interested in include:
 
 * [FOAF](http://xmlns.com/foaf/0.1/) (friend-of-a-friend; people and the
   relations between them).
