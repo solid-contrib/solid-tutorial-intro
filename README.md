@@ -1,47 +1,15 @@
-# Introductory Solid Tutorial
+# Building decentralized applications for the social Web
 
-## Introduction
+## WWW 2016 Tutorial, Tuesday 12 April
 
-[Solid](https://github.com/solid/solid) (derived from "**so**cial **li**nked **d**ata")
-is a proposed set of conventions and tools for building *decentralized social
-applications* based on [Linked Data](http://www.w3.org/DesignIssues/LinkedData.html)
-principles. Solid is modular and extensible. It relies as much as possible on existing
-[W3C](http://www.w3.org/) standards and protocols.
+### Introduction
 
-Specifically, Solid is:
+This morning we will introduce you to the ideas behind personal datastores and
+how to build applications that use data in people's personal datastores using
+the Solid protocols. After the coffee break we'll do a walkthrough of an example
+application, and this afternoon you're free to build your own applications.
 
-* A tech stack -- a set of complementary
-  [standards](https://github.com/solid/solid-spec#standards-used) and
-  [data formats/vocabularies](https://github.com/solid/vocab) that together
-  provide capabilities that are currently available only through centralized
-  social media services (think Facebook/Twitter/LinkedIn/many others), such as
-  *identity*, *authentication and login*, *authorization and permission lists*,
-  *contact management*, *messaging and notifications*, *feed aggregation and
-  subscription*, *comments and discussions*, and more.
-* A **[Specifications document](https://github.com/solid/solid-spec)**
-  that describes a REST API that extends those existing
-  standards, contains design notes on the individual components used, and is
-  intended as a guide for developers who plan to build servers or applications.
-  See also the **[Solid API](#solid-api)** section of this tutorial.
-* A set of [servers](https://github.com/solid/solid-platform#servers) that
-  implement this specification.
-* A [test suite](https://github.com/solid/solid-tests) for testing and validating
-  Solid implementations.
-* An ecosystem of [social apps](https://github.com/solid/solid-apps),
-  [identity providers](https://github.com/solid/solid-idp-list) and helper
-  libraries (such as [solid.js](https://github.com/solid/solid.js)) that run on
-  the Solid platform.
-* A community providing documentation,
-  [tutorials](https://github.com/solid/solid-tutorials) and
-  [talks/presentations](https://github.com/solid/talks).
-
-## Solid Concepts
-
-Before going into the details of the Solid tech stack and API, it helps to
-understand the underlying concepts the project was built on, its motivation and
-context.
-
-#### Why decentralized applications?
+### Decentralisation: motivation and principles
 
 Developing a technology stack that enables truly *user-centric* de-centralized
 applications can drastically improve the life of both users and app developers:
@@ -86,315 +54,86 @@ By focusing on the re-use of standard protocols, formats and vocabularies, and
 by providing a common data access API (as well as an Access Control List format),
 Solid enables and encourages interoperability.
 
-#### De-centralized identity
+### Protocols and APIs
 
-Any proposal for a de-centralized application infrastructure needs to solve the
-problem of de-centralizing user identity.
+We mentioned that applications that read, create and manipulate data are completely
+decoupled from where the data is stored. This means that applications and datastores
+(servers) need a common protocol to speak to each other.
 
-Solid uses [WebID](http://www.w3.org/2005/Incubator/webid/spec/identity/) URLs
-to provide universal usernames/IDs for Solid apps, and to refer to unique Agents
-(people, organizations, devices). (See the [Authentication and User
-Profiles](#authentication-and-user-profiles) section below, for more details).
+Datastores use a RESTful API, and store data as RDF. Every *resource* in the data has
+a URL, whether this is a document, an image, a person, an abstract concept, or a
+relationship between two resources. Applications can use HTTP to create, read, update
+and delete resources in a datastore. Resources can be organised hierarchically in
+*containers*, which can be thought of like folders/directories.
 
-This provides several benefits:
+Simply, to get the data about (the attributes and their values of) any resource, an application
+does a GET request on the URL of the resource. For all of the resources in a container, a GET request on
+the container returns a list. For an application to create a new resource in a container,
+make an HTTP POST request to the container itself with the attributes of that resource,
+and an optional slug. To update a resource (or a container) use PUT or PATCH and to delete
+use DELETE.
 
-* The convenience of a persistent, user-controlled reusable sign-in
-* Can be as descriptive or anonymous as the user wants
-* Users have the option of creating multiple identities/logins,
-    to protect separation of concerns (work-life, etc)
+| Action | Path | Description |
+|--------|------|------------------------|
+| `GET` | `/path/to/resource` | Retrieve a resource or list of resources in a container |
+| `POST` | `/path/to/parent/` | Create a new resource in container |
+| `PUT` | `/path/to/resource` | Replace a resource |
+| `PATCH` | `/path/to/resource` | Update a resource |
+| `DELETE` | `/path/to/resource` | Delete a resource |
 
-* Persistent de-centralized identities mean that a user has to assemble their
-    social graph (friends/subscription list) only *once*, and then re-use it on
-    many social networks. Prevents the "ghost town" network effect that
-    prevents the formation of new social apps.
+The data that is sent and retrieved is RDF; the RDF serialisation we use by default is
+Turtle. Don't worry if you're not familiar with this format, we're going to show you
+handy libraries for working with it. If you want to find out more about Linked Data
+principles you can see **[Linked Data 101](http://rhiaro.github.io/sws/)** for a quick
+run down.
 
-* An important step towards building a Web of Trust
-
-#### REST API for resources
-
-Solid uses the [Linked Data Platform (LDP)](http://www.w3.org/TR/ldp/) standard
-(see also [LDP Primer](http://www.w3.org/TR/ldp-primer/)) extensively, as a
-standard way of reading and writing generic Linked Data resources.
-See the **[Solid API](#solid-api)** section below, for API listings and examples.
-
-## Linked Data
-
-> Linked Data is simply about using the Web to create typed links between data
-  from different sources. These may be as diverse as databases maintained by two
-  organizations in different geographical locations, or simply heterogeneous
-  systems within one organization that, historically, have not easily
-  interoperated at the data level. Technically, Linked Data refers to data
-  published on the Web in such a way that it is machine-readable, its meaning is
-  explicitly defined, it is linked to other external data sets, and can in turn be
-  linked to from external data sets.
-  *(from [Linked Data - Bizer, Heath and Berners-Lee
-  (2009)](http://tomheath.com/papers/bizer-heath-berners-lee-ijswis-linked-data.pdf))*
-
-The Solid project is based on
-[Linked Data](https://en.wikipedia.org/wiki/Linked_data)
-principles. These can be roughly summarized as:
-
-* HTTP URLs make fantastic globally unique IDs (and because they're HTTP, people and
-  machines can easily look up/dereference those links)
-
-* You should publish structured data in a way that's machine-readable and inter-linked
-  (because linking to other data increases the value of all data involved).
-
-* It would be helpful if your data structure was standardized, composable and
-  have a self-describing, extensible schema.
-
-* In fact, RDF provides just such a generic, graph-based data model with which
-  to structure and link data that describes things in the world. So you should
-  strongly consider using it.
-
-### Introduction to RDF (for Data Representation)
-
-RDF, the Resource Description Framework, is one of the key ingredients of Linked
-Data, and provides a generic graph-based data model for describing things,
-including their relationships with other things. Another way to think about this
-that's familiar to many developers, is that RDF allows you to create
-[Entity-Attribute-Value
-models](https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model)
-in a standard and machine-readable way.
-
-RDF data can be written down in a number of different interoperable ways, known
-as *serialisations*:
-
-- the original XML/RDF format
-- Turtle RDF (easier to read and write, used by default in Solid)
-- RDFa (RDF embedded into HTML attributes)
-- JSON-LD
-
-See **[Linked Data 101](http://rhiaro.github.io/sws/)** or the [RDF primer](https://www.w3.org/2000/10/swap/Primer.html) for a quick introduction
-to RDF structure and concepts.
+This API is a W3C standard called [Linked Data Platform
+(LDP)](http://www.w3.org/TR/ldp/) (see also [LDP Primer](http://www.w3.org/TR/ldp-primer/)).
 
 ### Schemas and Vocabularies
 
-As much as possible, Solid apps should aim to use existing schemas and vocabularies
-to promote [interoperability](#interoperability).
+You're used to describing data in a database with a schema; a set of terms that describe
+attributes of a data item for which you can set values. For global interoperability on the
+Web, we all need to find a way to cooperate when choosing schemas to represent our data.
 
-**Vocabularies** or ontologies are a set of words and phrases that someone has decided to put together for the
-purposes of describing a particular topic. They usually consist of classes and properties.
+Fortunately many people publish RDF vocabularies which cover different domains, and the idea
+is to reuse existing ones as much as possible. All terms in a vocabulary (just like any other data
+item) have their own URL. This ensures that when two people use the same term they can use a
+globally unique identifier to show they mean the same thing.
 
-**Classes** are used to say that `<some-thing>` is of type `<other-thing>`.
-For example:
-`<http://rhiaro.co.uk/about#me> type <Person>`.
-(Person is the class). Classes start with an uppercase letter.
+* **Vocabularies** or ontologies are a set of words and phrases that someone has decided to put
+together for the purposes of describing a particular topic. They usually consist of classes and
+properties.
 
-**Properties** are just the describing words. In the previous example `type` is
-the property, and before that name was the property. Properties are camelCased.
+* **Classes** are used to say that `<some-thing>` is of type `<other-thing>`.
+For example: `<http://rhiaro.co.uk/about#me> type <Person>`. (Person is the class).
 
-**Anyone can publish** a vocabulary, and you can use vocabularies that anyone
+* **Properties** are the attributes. In the previous example `type` is
+the property.
+
+* **Anyone can publish** a vocabulary, and you can use vocabularies that anyone
 else has published. There are lots out there on the web, some better than others.
 
 There are well-known, *stable* vocabularies. Examples include: RDF and RDFS
 (which provide the basics for describing anything), FOAF (for describing people
-and their friends), Dublin Core (for describing publications, mostly).
+and their friends), Dublin Core (for describing publications, mostly),
+[schema.org](https://schema.org) (covers a broad variety of things).
 
-Vocabulary **reuse** is good practice, that is: look up if someone else has
-already coined terms to describe what you want to describe, before thinking
-about creating your own. A good place to start is http://lov.okfn.org
+A good place to start looking for domain-specific terms to reuse is [LOV](http://lov.okfn.org).
 
-Social vocabularies you might be interested in for your applications include:
+Vocabularies specifically for social applications you might be interested in include:
 
 * [FOAF](http://xmlns.com/foaf/0.1/) (friend-of-a-friend; people and the
   relations between them).
 * SIOC (semantically-interlinked online communities; some basic social stuff,
   simple but a little dated and based on forums / message board kinds of data).
-* (AS2) ActivityStreams 2.0 (an emerging W3C standard for describing most of the
-  kinds of social data we see on the web today).
+* [ActivityStreams 2.0](http://www.w3.org/tr/activitystreams) (an emerging W3C standard for
+describingmost of the kinds of social data we see on the web today).
 
-#### ActivityStreams 2.0 (AS2)
+### Users, authentication and access control
 
-AS2 comes in two parts: the [core](https://www.w3.org/TR/activitystreams-core/),
-and the [vocabulary](https://www.w3.org/TR/activitystreams-vocabulary). The core
-is about the structure of the data, and the vocabulary is all the terms (classes
-and properties) you use in that structure. AS2 consists of 4 core types of
-thing:
-
-* Actors (people, robots, ..)
-* Objects (eg. articles, media, events ...)
-* Activities (eg. create, like, follow, accept an invitation, ...)
-* Collections (a list of any of the above)
-
-As well as lots of properties to describe these things, and to link them
-together. For example:
-
-**An object** (a note with some content):
-
-```
-<http://rhiaro.co.uk/2015/12/theres-nothing> a as:Note ;
-
-        as:content "If there's nothing wrong with me... maybe there's something wrong with the universe." ;
-
-        as:actor <http://rhiaro.co.uk/about#me> ;
-
-        as:published "2015-12-29T19:49+00:00"^^xsd:dateTime ;
-
-        as:tag <http://rhiaro.co.uk/tag/star+trek>, <http://rhiaro.co.uk/tag/life> .
-```
-
-**An activity** (the act of creating the above note, e.g. imagine it as it would appear in a notifications stream):
-
-```
-<http://rhiaro.co.uk/activities/12345> a as:Create ;
-
-    as:object <http://rhiaro.co.uk/2015/12/theres-nothing> ;
-
-    as:actor <http://rhiaro.co.uk/about#me> ;
-
-    as:published "2015-12-29T19:49+00:00"^^xsd:dateTime .
-```
-
-A reply can be represented as a `Note` object, with a value in the `inReplyTo`
-property.
-
-A like can be represented as an Activity with a `Like` type, and the object
-being liked in the `object` property.
-
-More complex things can be represented too, e.g. adding a photo to an album
-(which is a collection):
-
-```
-<http://img.amy.gy/food> a as:Collection ;
-
-      as:name "My food photos" ;
-
-      as:items
-
-    <http://img.amy.gy/files/food/151129_chocpie2.jpg>,
-
-    <http://img.amy.gy/files/food/151129_chocpie3.jpg> .
-
-
-<http://img.amy.gy/files/food/151129_chocpie4.jpg> a as:Photo .
-
-
-<http://activities.example/12345> a as:Add ;
-
-    as:actor <http://rhiaro.co.uk/about#me> ;
-
-    as:object <http://img.amy.gy/files/food/151129_chocpie4.jpg> ;
-
-    as:target <http://img.amy.gy/food> .
-```
-
-And if AS2 doesn't cover something you want to model data about, you can extend
-it simply by using your own vocabulary terms alongside.
-
-## Solid
-
-The sections below provide an overview of what you need to know to
-use the Solid platform.
-See also the [Solid specs document](https://github.com/solid/solid-spec)
-for more details.
-
-### Authentication and User Profiles
-
-Authentication is the process of an app determining a user’s identity, “How do I
-know you are who you say?”. (This is related to but also different from
-Authorization (see Web Access Control below), which is “Now that I know who you
-are, are you *allowed* to perform this action?”)
-
-How do web applications typically authenticate users (that is, how do they
-verify identity)? The most common method is usernames and passwords. A username
-uniquely identifies a user (and ties them with a user *profile*, usually), and a
-password verifies that the user is who they say they are.
-
-In the Solid world, users don’t have to authenticate to applications, because
-applications are decoupled from the data they produce. Instead, this means that
-users will authenticate themselves to the servers on which data resides.
-
-Continuing with the username and password analogy, Solid uses a URL as the
-username, as a globally unique identifier. This URL is referred to as the **Web
-ID**, and has a couple of required properties.
-
-While the exact shape of the WebID URL will depend on which server you're
-hosting it on, on many of the current Solid implementations, it will look
-something like this:
-
-`https://user.example.com/profile/card#me`
-
-Fetching this WebID URL results in a **WebID Profile Document**
-(which you can think of as an extensible universal user profile). This profile is a
-[web document](https://en.wikipedia.org/wiki/Web_document), by default returned
-in [Turtle](https://www.w3.org/TR/turtle/) RDF format, that describes some useful
-facts about the user. (While the Turtle format is required by the spec, other profile
-serialization formats such as RDFa and JSON-LD are often supported by servers.)
-
-Solid stores WebID profile documents using the
-[FOAF (Friend-of-a-Friend) RDF vocabulary](http://xmlns.com/foaf/0.1/).
-A profile can optionally have a number of properties, such as names, pictures,
-organization membership, socia media profiles, and so on. (Or, in the time honored
-tradition of user profiles, all of these can be left blank.)
-
-For example, this is what a part of a WebID Profile looks like:
-
-```
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-
-<> a foaf:PersonalProfileDocument ;
-      foaf:maker <#me> ;
-      foaf:primaryTopic <#me> .
-
-<#me> a foaf:Person ;
-      foaf:name "Tim Berners-Lee" ;
-      foaf:img <picture.jpg>.
-```
-
-So far, we've discussed how Solid handles user IDs and user profiles. What about
-passwords? Instead of passwords, the platform uses **WebID browser
-certificates** that are stored client-side (in their browsers' secure key
-stores).
-
-Think back to the typical web app user registration workflow. You register with
-a particular app or service, which asks you to pick a username and password
-(which you can later use to log in), and generates a user profile.
-
-Similarly, to use most Solid apps, you will need to register *somewhere*, but
-unlike most web apps, the choice of which server or storage provider you want to
-host your user identity and profile is yours (see the [Getting a WebID
-Profile](#getting-a-webid-profile) section below). When you register for a WebID
-profile for use with Solid, the signup app will typically will do 3 things:
-
-1. prompt you for a username to use as a sub-domain (which will influence your
-  WebID URL)
-2. create a WebID Profile at that URL, and
-3. generate a browser-side *WebID security certificate* that goes with that
-  profile
-
-From that point on, when you access a Solid web app that needs to authenticate
-you, instead of a pop-up form asking for your username and password, the browser
-prompts you to select your WebID security certificate that points to a profile
-you want to log in with.
-
-To put it in other words, the certificate stored in your browser serves both as
-a username (since it contains inside it a link to your WebID) *and* a password
-(in the form of a public/private cryptographic key pair that it also stores).
-
-#### Getting a WebID account
-
-As mentioned before, you will need a WebID account (with a corresponding browser
-certificate) in order to use most Solid apps. The *good* news is that you only
-need to sign up for it once, and afterwards re-use it anywhere on the . In that
-regard, WebIDs are conveniently reusable (although nothing prevents you from
-having multiple WebIDs and profiles, for purposes of avoiding linkability and
-increased privacy).
-
-To get a WebID profile and certificate, you have two options:
-
-1. Sign up for a free account from one of the Solid-compliant
-    [identity providers](https://solid.github.io/solid-idps/), such as
-    [databox.me](https://databox.me/).
-
-2. Or, if you are a hands-on dev type, set up one of the
-  [Solid servers](https://github.com/solid/solid-platform#servers), and launch
-  it pointing to a [signup app](https://solid.github.io/solid-signup/),
-  which will walk you through creating a WebID profile and certificate.
-
-#### Solid Authentication and User Profile Summary
-
-* Solid uses WebID URLs as unique user IDs
+Solid uses WebID URLs as unique user IDs. This means that no matter where on the web a user is
+interacting, they have one identifier which they can use to sign into their personal datastore.
 
 * Not just humans allowed: Apps and services can have their own WebIDs, or borrow
   a user's WebID when needed (through delegation)
@@ -408,37 +147,14 @@ To get a WebID profile and certificate, you have two options:
 * You need a WebID profile and related certificate on a Solid-compatible storage
   provider to use any Solid-based apps.
 
-### Access Control
-
 How can we decide who has access to a particular resource? Since we have
 identities, we could use them to define who has read or write access to
 resources. These lists are called ACL (Access Control List), and they follow the
 [Web Access Control spec](https://www.w3.org/wiki/WebAccessControl)
 
-### Solid API
-
-Let’s think of the web as a file system, in which every path leads to either a
-resource or to a container (`https://example.tld/container/resource.json`).
-These can be created, updated and deleted using CRUD operations.
-
-| Action | Path | Description |
-|--------|------|------------------------|
-| `GET` | `/path/to/resource` | Retrieve a resource or list of resources in a container |
-| `POST` | `/path/to/parent/` | Create a new resource in container |
-| `PUT` | `/path/to/resource` | Replace a resource |
-| `PATCH` | `/path/to/resource` | Update triples of a resource |
-| `DELETE` | `/path/to/resource` | Delete a resource |
-
-You can use simple Ajax requests to perform these operations. However, to make
-it easier, we have written a Javascript library
-[solid.js](https://github.com/solid/solid.js). You can continue the tutorial on
-how to use the library to make web apps:
-
-https://github.com/solid/solid.js.
-
 ### Pastebin Example
 
-This example will walk you through the steps required to build a typical Solid app. 
+This example will walk you through the steps required to build a typical Solid app.
 You will learn how to:
 - create new resources (paste bins)
 - view created bins
@@ -556,7 +272,7 @@ function publish () {
 }
 ```
 
-**Reading/viewing bins** 
+**Reading/viewing bins**
 
 Now that we have a way to create new bins, let's create a corresponding function that reads and displays bins.
 
@@ -595,7 +311,7 @@ function load (url, showEditor) {
         console.log(err);
     });
 }
-```    
+```
 
 Now that we have set our `bin` object with the right values, we can update the view, depending on whether or not we have to display the editor.
 
