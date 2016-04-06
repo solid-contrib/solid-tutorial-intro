@@ -203,15 +203,10 @@ var bin = {
 ### Picking the Vocabularies
 
 For this particular app, we can go with two very common vocabularies, `SIOC` and
-`Dublin Core Terms`. Using them is just a matter of defining the rdflib.js
-namespaces.
-
-```js
-// common RDF vocabs
-var RDF = $rdf.Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-var DCT = $rdf.Namespace("http://purl.org/dc/terms/")
-var SIOC = $rdf.Namespace("http://rdfs.org/sioc/ns#")
-```
+`Dublin Core Terms`. You can see their usage in the `load()` function, for
+example. Specifically, we'll be using the `title` predicate (referred to as
+`vocab.dct('title')` in the code), and the `content` predicate (as
+`vocab.sioc('content')`).
 
 ### Deciding Where to Store New Bins
 
@@ -231,13 +226,13 @@ the editor. The current example lacks CSS definitions for some classes (e.g.
 `hidden`), which you can get from the Github repo (link below).
 
 ```html
-<div class="content center-text" id="view" class="hidden">
+<div class="content center-text hidden" id="view">
     <h1 id="view-title"></h1>
     <br>
     <div id="view-body"></div>
 </div>
 
-<div class="content center-text" id="edit" class="hidden">
+<div class="content center-text hidden" id="edit">
     <input type="text" id="edit-title" class="block" placeholder="Title...">
     <br>
     <textarea id="edit-body" class="block" placeholder="Paste text here..."></textarea>
@@ -271,10 +266,11 @@ function publish () {
     bin.title = document.getElementById('edit-title').value
     bin.body = document.getElementById('edit-body').value
 
-    var g = new $rdf.graph()
-    g.add($rdf.sym(''), DCT('title'), $rdf.lit(bin.title))
-    g.add($rdf.sym(''), SIOC('content'), $rdf.lit(bin.body))
-    var data = new $rdf.Serializer(g).toN3(g)
+    var graph = $rdf.graph()
+    var thisResource = $rdf.sym('')
+    graph.add(thisResource, vocab.dct('title'), $rdf.lit(bin.title))
+    graph.add(thisResource, vocab.sioc('content'), $rdf.lit(bin.body))
+    var data = new $rdf.Serializer(graph).toN3(graph)
 }
 ```
 
@@ -289,10 +285,11 @@ function publish () {
     bin.title = document.getElementById('edit-title').value
     bin.body = document.getElementById('edit-body').value
 
-    var g = new $rdf.graph()
-    g.add($rdf.sym(''), DCT('title'), $rdf.lit(bin.title))
-    g.add($rdf.sym(''), SIOC('content'), $rdf.lit(bin.body))
-    var data = new $rdf.Serializer(g).toN3(g)
+    var graph = $rdf.graph()
+    var thisResource = $rdf.sym('')
+    graph.add(thisResource, vocab.dct('title'), $rdf.lit(bin.title))
+    graph.add(thisResource, vocab.sioc('content'), $rdf.lit(bin.body))
+    var data = new $rdf.Serializer(graph).toN3(graph)
 
     solid.web.post(defaultContainer, data).then(function(meta) {
         // view
@@ -316,7 +313,7 @@ editor or not.
 
 ```js
 function load (url, showEditor) {
-    solid.web.get(url).then(function(g) {
+    solid.web.get(url).then(function(response) {
 
     }).catch(function(err) {
         // do something with the error
@@ -325,25 +322,28 @@ function load (url, showEditor) {
 }
 ```
 
-The function `solid.web.get()` returns a graph object `g` in case of success.
-This object has a few methods that allow us to query the graph for specific
-triples - i.e. `g.any()`. We'll use this method to get the title and body of a
-bin.
+The function `solid.web.get()` returns a response on success, from which we
+can get a parsed graph object (parsed via
+[rdflib.js](https://github.com/linkeddata/rdflib.js/)). This graph object has a
+few methods that allow us to query the graph for specific triples - i.e.
+`graph.any()`. We'll use this method to get the title and body of a bin.
 
 ```js
 function load (url, showEditor) {
-    solid.web.get(url).then(function(g) {
+    solid.web.get(url).then(function(response) {
+        var graph = response.parsedGraph();
         // set url
-        bin.url = url
+        bin.url = response.url;
+        var subject = $rdf.sym(response.url);
         // add title
-        var title = g.any($rdf.sym(url), DCT('title'))
+        var title = graph.any(subject, vocab.dct('title'));
         if (title) {
-            bin.title = title.value
+            bin.title = title.value;
         }
         // add body
-        var body = g.any($rdf.sym(url), SIOC('content'))
+        var body = graph.any(subject, vocab.sioc('content'));
         if (body) {
-            bin.body = body.value
+            bin.body = body.value;
         }
     }).catch(function(err) {
         // do something with the error
@@ -360,17 +360,19 @@ Here is the final version of our `load` function.
 ```js
 function load (url, showEditor) {
     solid.web.get(url).then(function(g) {
+        var graph = response.parsedGraph();
         // set url
-        bin.url = url
+        bin.url = response.url;
+        var subject = $rdf.sym(response.url);
         // add title
-        var title = g.any($rdf.sym(url), DCT('title'))
+        var title = graph.any(subject, vocab.dct('title'));
         if (title) {
-            bin.title = title.value
+            bin.title = title.value;
         }
         // add body
-        var body = g.any($rdf.sym(url), SIOC('content'))
+        var body = graph.any(subject, vocab.sioc('content'));
         if (body) {
-            bin.body = body.value
+            bin.body = body.value;
         }
 
         if (showEditor) {
@@ -393,17 +395,18 @@ function load (url, showEditor) {
 
 ### Updating bins
 
-Updating bins is very similar to creating new ones. The only difference is that we use the URI of an existing bin, which we then pass to `solid.js`' `solid.web.put` function.
+Updating bins is very similar to creating new ones. The only difference is that we use the URI of an existing bin, which we then pass to `solid.js`' `solid.web.put()` function.
 
 ```js
 function update () {
     bin.title = document.getElementById('edit-title').value
     bin.body = document.getElementById('edit-body').value
 
-    var g = new $rdf.graph()
-    g.add($rdf.sym(''), DCT('title'), bin.title)
-    g.add($rdf.sym(''), SIOC('content'), bin.body)
-    var data = new $rdf.Serializer(g).toN3(g)
+    var graph = $rdf.graph();
+    var thisResource = $rdf.sym('');
+    graph.add(thisResource, vocab.dct('title'), bin.title);
+    graph.add(thisResource, vocab.sioc('content'), bin.body);
+    var data = new $rdf.Serializer(graph).toN3(graph);
 
     solid.web.put(bin.url, data).then(function(meta) {
         // view
