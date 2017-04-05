@@ -137,7 +137,7 @@ include:
   relations between them).
 * SIOC (semantically-interlinked online communities) - some basic social stuff,
   simple but a little dated and based on forums / message board kinds of data.
-* [ActivityStreams 2.0](http://www.w3.org/tr/activitystreams) - an emerging W3C
+* [ActivityStreams 2.0](https://www.w3.org/TR/activitystreams-core/) - an emerging W3C
   standard for describing most of the kinds of social data we see on the web
   today.
 
