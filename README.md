@@ -183,8 +183,7 @@ The easiest way to separate these different app functionalities, is to separate
 the states by using query parameters -- i.e. `?view=...`, `?edit=...`.
 
 Another important step we need to do right now is to add the required
-dependencies. These are [rdflib.js](https://github.com/linkeddata/rdflib.js) and
-[solid.js](https://github.com/solid/solid.js).
+dependencies. These are [rdflib.js](https://github.com/linkeddata/rdflib.js) and [solid-auth-client](https://solid.github.io/solid-auth-client/dist/solid-auth-client.bundle.js) , see : https://github.com/solid/solid-auth-client .
 
 ### Local Data Structure
 
